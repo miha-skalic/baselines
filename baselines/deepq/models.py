@@ -30,16 +30,24 @@ def mlp(hiddens=[], layer_norm=False):
     return lambda *args, **kwargs: _mlp(hiddens, layer_norm=layer_norm, *args, **kwargs)
 
 
-def _cnn_to_mlp(convs, hiddens, dueling, inpt, num_actions, scope, reuse=False, layer_norm=False):
+def _cnn_to_mlp(convs, hiddens, dueling, is3d, inpt, num_actions, scope, reuse=False, layer_norm=False):
     with tf.variable_scope(scope, reuse=reuse):
         out = inpt
         with tf.variable_scope("convnet"):
             for num_outputs, kernel_size, stride in convs:
-                out = layers.convolution2d(out,
-                                           num_outputs=num_outputs,
-                                           kernel_size=kernel_size,
-                                           stride=stride,
-                                           activation_fn=tf.nn.relu)
+                if not is3d:  # 2D preprocessing
+                    out = layers.convolution2d(out,
+                                               num_outputs=num_outputs,
+                                               kernel_size=kernel_size,
+                                               stride=stride,
+                                               activation_fn=tf.nn.relu)
+                else:  # 3D preprocessing
+                    out = layers.convolution3d(out,
+                                               num_outputs=num_outputs,
+                                               kernel_size=kernel_size,
+                                               stride=stride,
+                                               activation_fn=tf.nn.relu)
+
         conv_out = layers.flatten(out)
         with tf.variable_scope("action_value"):
             action_out = conv_out
@@ -67,7 +75,7 @@ def _cnn_to_mlp(convs, hiddens, dueling, inpt, num_actions, scope, reuse=False, 
         return q_out
 
 
-def cnn_to_mlp(convs, hiddens, dueling=False, layer_norm=False):
+def cnn_to_mlp(convs, hiddens, dueling=False, layer_norm=False, is3d=False):
     """This model takes as input an observation and returns values of all actions.
 
     Parameters
@@ -87,5 +95,5 @@ def cnn_to_mlp(convs, hiddens, dueling=False, layer_norm=False):
         q_function for DQN algorithm.
     """
 
-    return lambda *args, **kwargs: _cnn_to_mlp(convs, hiddens, dueling, layer_norm=layer_norm, *args, **kwargs)
+    return lambda *args, **kwargs: _cnn_to_mlp(convs, hiddens, dueling, is3d, layer_norm=layer_norm, *args, **kwargs)
 
