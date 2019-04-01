@@ -25,6 +25,8 @@ def worker(remote, parent_remote, env_fn_wrapper):
                 break
             elif cmd == 'get_spaces_spec':
                 remote.send((env.observation_space, env.action_space, env.spec))
+            elif cmd == 'done_grading':
+                remote.send(env.done_grading())
             else:
                 raise NotImplementedError
     except KeyboardInterrupt:
