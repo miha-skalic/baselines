@@ -40,7 +40,8 @@ setup(name='baselines',
           'progressbar2',
           'cloudpickle',
           'click',
-          'opencv-python'
+          'opencv-python',
+          'tensorflow==1.13.1'
       ],
       extras_require=extras,
       description='OpenAI baselines: high quality implementations of reinforcement learning algorithms',
@@ -52,12 +53,12 @@ setup(name='baselines',
 
 # ensure there is some tensorflow build with version above 1.4
 import pkg_resources
-tf_pkg = None
-for tf_pkg_name in ['tensorflow', 'tensorflow-gpu', 'tf-nightly', 'tf-nightly-gpu']:
-    try:
-        tf_pkg = pkg_resources.get_distribution(tf_pkg_name)
-    except pkg_resources.DistributionNotFound:
-        pass
-assert tf_pkg is not None, 'TensorFlow needed, of version above 1.4'
+# tf_pkg = None
+# for tf_pkg_name in ['tensorflow', 'tensorflow-gpu', 'tf-nightly', 'tf-nightly-gpu']:
+#     try:
+#         tf_pkg = pkg_resources.get_distribution(tf_pkg_name)
+#     except pkg_resources.DistributionNotFound:
+#         pass
+# assert tf_pkg is not None, 'TensorFlow needed, of version above 1.4'
 from distutils.version import LooseVersion
 assert LooseVersion(re.sub(r'-?rc\d+$', '', tf_pkg.version)) >= LooseVersion('1.4.0')
